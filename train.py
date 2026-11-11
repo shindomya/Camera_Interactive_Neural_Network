@@ -16,3 +16,4 @@ def minimize_data(data):
 
 timer_end = time.perf_counter()
 print(f"Code execution took: {timer_end-timer_start:.4f} seconds")
+#rawr
