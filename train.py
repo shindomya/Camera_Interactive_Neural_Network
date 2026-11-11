@@ -12,10 +12,7 @@ def get_data():
 def minimize_data(data):
     return data / 255
 
-#shape vektor 2D -> 1D
-def shape2_1(data):
-    return data.reshape(-1,784)
 
-class Layer_Dense:
-    def __init__(self,n_inputs,n_neurons):
-        self.weights = 0.1
+
+timer_end = time.perf_counter()
+print(f"Code execution took: {timer_end-timer_start:.4f} seconds")
