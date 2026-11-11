@@ -1,12 +1,13 @@
 import numpy as np
 import time
 import os 
+import cv2
 
 timer_start = time.perf_counter()
 
 #training data
 def get_data():
-    pass
+    img = cv2.imread("")
 
 #minimize data
 def minimize_data(data):
