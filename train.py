@@ -34,7 +34,10 @@ def show_image(mirrored_frame):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    
+def invert(mirrored_image):
+    inverted_image = cv2.bitwise_not(mirrored_image)
+    return inverted_image
+
 
 
 #minimize data
@@ -44,7 +47,9 @@ def minimize_data(data):
 frame = get_data()
 mirrored_frame = mirror(frame)
 
-show_image(mirrored_frame)
+#show_image(mirrored_frame)
+inverted_image = invert(mirrored_image)
+
 
 timer_end = time.perf_counter()
 print(f"Code execution took: {timer_end-timer_start:.4f} seconds")
