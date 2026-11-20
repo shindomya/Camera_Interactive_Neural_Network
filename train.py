@@ -18,19 +18,34 @@ def get_data():
             break
     cap.release()
     cv2.destroyAllWindows()
-    inverted_frame = invert(frame)
-    return inverted_frame()
+    return last_frame
+
+def mirror(img):
+    h,w = img.shape[:2]
+    M_horiz = np.float32([
+        [-1, 0, w-1],
+        [0,1,0]
+    ])
+    mirrored_h = cv2.warpAffine(img, M_horiz, (w,h))
+    return mirrored_h
+
+def show_image(mirrored_frame):
+    cv2.imshow("Mirrored Frame",mirrored_frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    
+
 
 #minimize data
 def minimize_data(data):
     return data / 255
 
-inverted_frame = get_data()
+frame = get_data()
+mirrored_frame = mirror(frame)
 
-new_data = minimize_data(inverted_frame)
-print(new_data)
-
+show_image(mirrored_frame)
 
 timer_end = time.perf_counter()
 print(f"Code execution took: {timer_end-timer_start:.4f} seconds")
-#rawr
+
