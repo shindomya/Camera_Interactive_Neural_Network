@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 import os
+import cv2
 
 #start timer
 start = time.perf_counter()
@@ -101,7 +101,6 @@ activation1 = Activation_ReLU()
 layer2 = Layer_Dense(64,10)
 activation2 = Activation_Softmax()
 
-cce = Loss_CategoricalCrossentropy()
 if os.path.exists("mnist_weights.npz"):
     saved = np.load("mnist_weights.npz")
 

@@ -127,7 +127,7 @@ if os.path.exists("mnist_weights.npz"):
     layer2.biases = saved["biases2"]
 
 learning_rate = 0.01
-for epoche in range(50): 
+for epoche in range(1): 
     for i in range(1):
         layer1.forward(frame6)
         activation1.forward(layer1.output)
