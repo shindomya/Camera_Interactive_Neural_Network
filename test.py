@@ -43,6 +43,9 @@ def color_gray(frame):
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     return gray_frame
 
+def pixel_fix(img):
+    -, img = cv2.treshold(img, 50, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return img
 def scale(frame):
     scaled_frame = cv2.resize(frame, (28,28), interpolation=cv2.INTER_AREA)
     return scaled_frame
@@ -88,12 +91,13 @@ class Activation_Softmax:
 
 
 frame = get_data()
-frame1 = mirror(frame)
-frame2 = invert(frame1)
-frame3 = color_gray(frame2)
-frame4 = scale(frame3)
-frame5 = minimize_data(frame4)
-frame6 = resize(frame5)
+frame = mirror(frame)
+frame = invert(frame)
+frame = color_gray(frame)
+frame = scale(frame)
+frame = pixel_fix(frame)
+frame = minimize_data(frame)
+frame = resize(frame)
 
 layer1 = Layer_Dense(784, 64)
 activation1 = Activation_ReLU()
