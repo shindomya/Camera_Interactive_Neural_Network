@@ -4,21 +4,9 @@ import os
 import cv2
 
 timer_start = time.perf_counter()
-
-#training data
-def get_data():
-    cap = cv2.VideoCapture(0)
-    while cap.isOpened():
-        ret, frame = cap.read()
-        cv2.imshow("Webcam",frame)
-        
-        last_frame = frame
-
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-    cap.release()
-    cv2.destroyAllWindows()
-    return last_frame
+path = "/home/greed/Documents/nn/cvnn/numb_data_set/"
+x_list = []
+y_list = []
 
 def mirror(img):
     h,w = img.shape[:2]
@@ -42,23 +30,25 @@ def color_gray(frame):
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     return gray_frame
 
+def pixel_fix(img):
+    _, img = cv2.threshold(img, 50,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return img
+
 def scale(frame):
     scaled_frame = cv2.resize(frame, (28,28), interpolation=cv2.INTER_AREA)
     return scaled_frame
+
 def resize(frame):
     resized_frame = frame.reshape(1,784)
     return resized_frame
+
 #minimize data
 def minimize_data(data):
     return data / 255
 
-def ask_solution():
-    print("what's the solution?")
-    return np.array([int(input())])
-
 class Layer_Dense:
     def __init__(self,n_inputs,n_neurons):
-        self.weights = 0.1 * np.random.rand(n_inputs, n_neurons)
+        self.weights = np.random.rand(n_inputs, n_neurons) * np.sqrt(2.0//n_inputs)
         self.biases = np.zeros((1, n_neurons))
     def forward(self,inputs):
         self.inputs = inputs
@@ -99,13 +89,19 @@ class Loss_CategoricalCrossentropy:
         dvalue = (output_value - clean_matrix) / division
         return dvalue
 
-frame = get_data()
-frame1 = mirror(frame)
-frame2 = invert(frame1)
-frame3 = color_gray(frame2)
-frame4 = scale(frame3)
-frame5 = minimize_data(frame4)
-frame6 = resize(frame5)
+for i in range(19):
+    img = cv2.imread(f"{path}/{i:02d}.jpg")
+    img = color_gray(img)
+    img = invert(img)
+    img = scale(img)
+    img = pixel_fix(img)
+    img = minimize_data(img)
+    img = resize(img)
+    x_list.append(img[0])
+    y_list.append(i % 10)
+
+x_all = np.array(x_list)
+y_all = np.array(y_list)
 
 layer1 = Layer_Dense(784, 64)
 activation1 = Activation_ReLU()
@@ -115,7 +111,6 @@ activation2 = Activation_Softmax()
 
 cce = Loss_CategoricalCrossentropy()
 
-solution = ask_solution()
 
 if os.path.exists("mnist_weights.npz"):
     saved = np.load("mnist_weights.npz")
@@ -126,37 +121,41 @@ if os.path.exists("mnist_weights.npz"):
     layer2.weights = saved["weights2"]
     layer2.biases = saved["biases2"]
 
-learning_rate = 0.01
-for epoche in range(1): 
-    for i in range(1):
-        layer1.forward(frame6)
-        activation1.forward(layer1.output)
+learning_rate = 0.1
+batch_size = 10
+for epoche in range(500): 
+    random_cases = np.random.choice(len(x_all), batch_size,replace=False)
 
-        layer2.forward(activation1.output)
-        activation2.forward(layer2.output)
+    x_batch = x_all[random_cases]
+    y_batch = y_all[random_cases]
 
-        loss = cce.calculate(activation2.output,solution)
-        matrix_solution = cce.one_hot_matrix(solution)
+    layer1.forward(x_batch)
+    activation1.forward(layer1.output)
+    layer2.forward(activation1.output)
+    activation2.forward(layer2.output)
+
+    loss = cce.calculate(activation2.output,y_batch)
+    matrix_solution = cce.one_hot_matrix(y_batch)
     
-        dvalues = cce.backward(activation2.output,matrix_solution,1)
+    dvalues = cce.backward(activation2.output,matrix_solution,batch_size)
     
-        layer2.backward(dvalues)
-        activation1.backward(layer2.dinputs)
-        layer1.backward(activation1.dinputs)
+    layer2.backward(dvalues)
+    activation1.backward(layer2.dinputs)
+    layer1.backward(activation1.dinputs)
 
-        layer1.weights -= learning_rate * layer1.dweights
-        layer1.biases -= learning_rate * layer1.dbiases
+    layer1.weights -= learning_rate * layer1.dweights
+    layer1.biases -= learning_rate * layer1.dbiases
 
-        layer2.weights -= learning_rate * layer2.dweights
-        layer2.biases -= learning_rate * layer2.dbiases
+    layer2.weights -= learning_rate * layer2.dweights
+    layer2.biases -= learning_rate * layer2.dbiases
     print(f"loss {epoche}: {loss}")
-    np.savez(
-            "mnist_weights.npz",
-            weights1 = layer1.weights,
-            biases1 = layer1.biases,
-            weights2 = layer2.weights,
-            biases2 = layer2.biases
-            )
+np.savez(
+        "mnist_weights.npz",
+        weights1 = layer1.weights,
+        biases1 = layer1.biases,
+        weights2 = layer2.weights,
+        biases2 = layer2.biases
+        )
         
 timer_end = time.perf_counter()
 print(f"Code execution took: {timer_end-timer_start:.4f} seconds")
