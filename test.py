@@ -46,6 +46,18 @@ def color_gray(frame):
 def pixel_fix(img):
     _, img = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return img
+
+def center(img):
+    coords = cv2.findNonZero(img)
+
+    x,y,w,h = cv2.boundingRect(coords)
+    digit = img[y:y+h,x:x+w]
+
+    digit = cv2.resize(digit, (20,20), interpolation=cv2.INTER_AREA)
+
+    centered = cv2.copyMakeBorder(digit, 4,4,4,4, cv2.BORDER_CONSTANT, value =0)
+    return centered
+
 def scale(frame):
     scaled_frame = cv2.resize(frame, (28,28), interpolation=cv2.INTER_AREA)
     return scaled_frame
@@ -96,6 +108,7 @@ frame = invert(frame)
 frame = color_gray(frame)
 frame = scale(frame)
 frame = pixel_fix(frame)
+frame = center(frame)
 frame = minimize_data(frame)
 frame = resize(frame)
 
