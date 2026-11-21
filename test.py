@@ -44,7 +44,7 @@ def color_gray(frame):
     return gray_frame
 
 def pixel_fix(img):
-    -, img = cv2.treshold(img, 50, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    _, img = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return img
 def scale(frame):
     scaled_frame = cv2.resize(frame, (28,28), interpolation=cv2.INTER_AREA)
@@ -115,7 +115,7 @@ if os.path.exists("mnist_weights.npz"):
     layer2.biases = saved["biases2"]
 
 
-layer1.forward(frame6)
+layer1.forward(frame)
 activation1.forward(layer1.output)
 
 layer2.forward(activation1.output)
