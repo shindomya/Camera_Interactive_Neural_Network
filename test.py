@@ -44,7 +44,7 @@ def color_gray(frame):
     return gray_frame
 
 def pixel_fix(img):
-    _, img = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    _, img = cv2.threshold(img, 20, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return img
 
 def center(img):
@@ -69,11 +69,6 @@ def resize(frame):
 #minimize pixel value 
 def minimize_data(y):
     return y / 255
-
-#shape 2D vektor - 1D vektor
-def shape2_1(x):
-    x = x.reshape(-1,784)
-    return x
 
 class Layer_Dense:
     def __init__(self,n_inputs,n_neurons):
@@ -103,14 +98,16 @@ class Activation_Softmax:
 
 
 frame = get_data()
-frame = mirror(frame)
+#frame = mirror(frame)
 frame = invert(frame)
 frame = color_gray(frame)
 frame = scale(frame)
 frame = pixel_fix(frame)
 frame = center(frame)
 frame = minimize_data(frame)
+tuff = show_image(frame)
 frame = resize(frame)
+
 
 layer1 = Layer_Dense(784, 64)
 activation1 = Activation_ReLU()

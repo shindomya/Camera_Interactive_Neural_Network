@@ -4,7 +4,7 @@ import os
 import cv2
 
 timer_start = time.perf_counter()
-path = "/home/greed/Documents/nn/cvnn/numb_data_set/"
+path = "./numb_data_set"
 x_list = []
 y_list = []
 
@@ -26,8 +26,8 @@ def invert(mirrored_image):
     inverted_image = cv2.bitwise_not(mirrored_image)
     return inverted_image
 
-def color_gray(frame):
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+def color_gray(img):
+    gray_frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return gray_frame
 
 def pixel_fix(img):
